@@ -1,0 +1,39 @@
+#!/usr/bin/python
+
+from xml.dom import minidom
+import urllib
+
+def getNodes(way):
+	url = "http://www.openstreetmap.org/api/0.6/way/" + str(way)
+	try:
+		xml = urllib.urlopen(url)
+		dom = minidom.parse(xml)
+	except e as Exception:
+		dom = minidom.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><osm></osm>");
+	nodes = []
+	for osm in dom.getElementsByTagName('osm'):
+		for way in osm.getElementsByTagName('way'):
+			for nd in way.getElementsByTagName('nd'):
+				nid = str(nd.attributes['ref'].value)
+				nodes.append(nid)
+	return nodes
+
+def getCoords(node):
+	url = "http://www.openstreetmap.org/api/0.6/node/" + str(node)
+	try:
+		xml = urllib.urlopen(url)
+		dom = minidom.parse(xml)
+	except e as Exception:
+		dom = minidom.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><osm></osm>");
+	nodedata = {}
+	for osm in dom.getElementsByTagName('osm'):
+		for node in dom.getElementsByTagName('node'):
+			for attr in node.attributes.keys():
+				nodedata[str(attr)] = str(node.attributes[attr].value)
+	return nodedata
+
+coords = []
+for node in getNodes("193799935"):
+	coords.append(getCoords(node))
+
+print coords

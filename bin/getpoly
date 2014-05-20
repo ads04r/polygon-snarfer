@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from xml.dom import minidom
-import urllib
+import urllib, sys
 
 def getNodes(way):
 	url = "http://www.openstreetmap.org/api/0.6/way/" + str(way)
@@ -32,8 +32,20 @@ def getCoords(node):
 				nodedata[str(attr)] = str(node.attributes[attr].value)
 	return nodedata
 
+if len(sys.argv) < 2:
+	print "getpoly [osm_way_id]"
+	exit();
+
+wayid = str(sys.argv[1])
+
 coords = []
-for node in getNodes("193799935"):
+for node in getNodes(wayid):
 	coords.append(getCoords(node))
 
-print coords
+wkta = []
+for coord in coords:
+	wkta.append(coord['lon'] + ' ' + coord['lat'])
+
+wkt = ','.join(wkta)
+
+print wkt

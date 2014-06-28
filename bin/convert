@@ -1,0 +1,51 @@
+#!/usr/bin/python
+
+from xml.dom import minidom
+import urllib, sys
+
+def getNodes(url):
+	try:
+		xml = urllib.urlopen(url)
+		dom = minidom.parse(xml)
+	except e as Exception:
+		dom = minidom.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><osm></osm>");
+	nodes = {}
+	for osm in dom.getElementsByTagName('osm'):
+		for node in osm.getElementsByTagName('node'):
+			n = {}
+			id = str(node.attributes['id'].value)
+			n['lat'] = float(str(node.attributes['lat'].value))
+			n['lon'] = float(str(node.attributes['lon'].value))
+			nodes[id] = n
+	return nodes
+
+def getPolygons(url):
+	try:
+		xml = urllib.urlopen(url)
+		dom = minidom.parse(xml)
+	except e as Exception:
+		dom = minidom.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><osm></osm>");
+	ways = []
+	for osm in dom.getElementsByTagName('osm'):
+		for way in osm.getElementsByTagName('way'):
+			curway = []
+			for nd in way.getElementsByTagName('nd'):
+				curway.append(str(nd.attributes['ref'].value))
+			ways.append(curway)
+	return ways
+
+if len(sys.argv) < 2:
+	print "getpoly [osm_file]"
+	exit();
+
+path = str(sys.argv[1])
+
+coords = getNodes(path)
+polys = getPolygons(path)
+
+for poly in polys:
+	wkt = []
+	for nid in poly:
+		node = coords[nid]
+		wkt.append(str(node['lon']) + ' ' + str(node['lat']))
+	print ','.join(wkt)

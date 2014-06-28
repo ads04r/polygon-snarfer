@@ -3,8 +3,8 @@
 from xml.dom import minidom
 import urllib, sys
 
-def getNodes(way):
-	url = "http://www.openstreetmap.org/api/0.6/way/" + str(way)
+def getNodes(wayid):
+	url = "http://www.openstreetmap.org/api/0.6/way/" + str(wayid)
 	try:
 		xml = urllib.urlopen(url)
 		dom = minidom.parse(xml)
@@ -18,8 +18,8 @@ def getNodes(way):
 				nodes.append(nid)
 	return nodes
 
-def getCoords(node):
-	url = "http://www.openstreetmap.org/api/0.6/node/" + str(node)
+def getCoords(nodeid):
+	url = "http://www.openstreetmap.org/api/0.6/node/" + str(nodeid)
 	try:
 		xml = urllib.urlopen(url)
 		dom = minidom.parse(xml)

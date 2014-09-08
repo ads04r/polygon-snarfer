@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from xml.dom import minidom
-import urllib, sys
+import urllib, sys, json
 
 def getNodes(wayid):
 	url = "http://www.openstreetmap.org/api/0.6/way/" + str(wayid)
@@ -43,9 +43,18 @@ for node in getNodes(wayid):
 	coords.append(getCoords(node))
 
 wkta = []
+ttllat = 0.0
+ttllon = 0.0
 for coord in coords:
+	ttllat = ttllat + float(coord['lat'])
+	ttllon = ttllon + float(coord['lon'])
 	wkta.append(coord['lon'] + ' ' + coord['lat'])
 
 wkt = ','.join(wkta)
 
-print wkt
+op = {}
+op['lat'] = (ttllat / float(len(wkta)))
+op['lon'] = (ttllon / float(len(wkta)))
+op['wkt'] = wkt
+
+print json.dumps(op)
